@@ -1,13 +1,31 @@
 from ultralytics import YOLO
+import os
 
-# 1. Cargar el modelo (nano, el más pequeño)
+# Cargamos el modelo nano
 model = YOLO("yolo11n.pt")
-# Predecir una imagen
 
-results = model("imagenes_carros\WhatsApp Image 2025-05-24 at 08.45.01.jpeg")
+#Definimos una lista con las clases que queremos encontrar
+vehicle_classes = ["car", "truck", "bus", "motorcycle", "bicycle"]
 
-# Mostrar el resultado (con las cajas dibujadas)
-results[0].show()
 
-# Guardar el resultado si quieres
-results[0].save(filename="resultado.jpg")
+def predict_image(image_path):
+    # definimos nombre de archivo
+    filename=os.path.basename(image_path)
+    filename.split(".")[0]
+    filename+="_prediction.jpg"
+    results=model(image_path)
+
+    detections = results[0].boxes.cls.cpu().numpy()
+    detected_classes = [model.names[int(i)] for i in detections]
+
+    results[0].show()
+    results[0].save(filename=filename)
+
+    flag = any(class_d in detected_classes for class_d in vehicle_classes)
+
+    if flag:
+       print(f"Se detectaron las clases: {detected_classes}")
+    else:
+        print("La imagen no muestra vehiculos de ningun tipo")
+
+   
