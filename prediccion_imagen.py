@@ -11,7 +11,7 @@ vehicle_classes = ["car", "truck", "bus", "motorcycle", "bicycle"]
 def predict_image(image_path):
     # Definimos nombre de archivo de salida
     filename = os.path.basename(image_path)
-    filename = filename.split(".")[0] + "_prediction.jpg"
+    filename = "\\bounding_boxes"+filename.split(".")[0] + "_prediction.jpg"
 
     # Ejecutamos el modelo sobre la imagen
     results = model(image_path)
