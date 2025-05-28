@@ -1,6 +1,7 @@
 from ultralytics import YOLO
 import os
 from collections import Counter
+import cv2
 
 # Cargamos el modelo nano
 model = YOLO("yolo11n.pt")
@@ -8,7 +9,7 @@ model = YOLO("yolo11n.pt")
 # Definimos una lista con las clases que queremos encontrar
 vehicle_classes = ["car", "truck", "bus", "motorcycle", "bicycle"]
 
-def predict_image(image_path):
+def predict_image(image_path,image_index=""):
     # Definimos nombre de archivo de salida
     filename = os.path.basename(image_path)
     filename = "\\bounding_boxes"+filename.split(".")[0] + "_prediction.jpg"
@@ -43,4 +44,34 @@ def predict_image(image_path):
         print("La imagen no muestra vehículos de ningún tipo.")
 
 
-   
+def predict_video(video_path):
+    cap = cv2.VideoCapture(video_path)
+
+# Verificar si se abrió correctamente el archivo de video
+    if not cap.isOpened():
+        print("Error abriendo el archivo de video.")
+        exit()
+
+    # Crear una carpeta para guardar los fotogramas (si no existe)
+    import os
+    output_folder = "fotogramas"
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Contador de fotogramas
+    frame_count = 0
+
+    # Leer los fotogramas del video
+    while True:
+        ret, frame = cap.read()  # ret = True si el frame fue leído correctamente, frame = el fotograma
+        if ret:  # Si se leyó el frame, guardarlo
+            frame_path = os.path.join(output_folder, f"fotograma_{frame_count}.png")
+            cv2.imwrite(frame_path, frame)
+            predict_image(frame_path,str(frame_count))
+            frame_count += 1
+
+        else: 
+            break
+
+    # Liberar los recursos
+    cap.release()
